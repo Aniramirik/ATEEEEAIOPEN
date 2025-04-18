@@ -1,0 +1,515 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>GenZ AI Translator</title>
+  <style>
+    body {
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      background-color: #f0f4f8;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      height: 100vh;
+      margin: 0;
+      padding: 1rem;
+    }
+    h1 {
+      color: #4f46e5;
+      margin-bottom: 0.5rem;
+      font-size: 2rem;
+      text-shadow: 1px 1px 2px rgba(0,0,0,0.1);
+    }
+    .starter-list {
+      display: flex;
+      gap: 0.5rem;
+      flex-wrap: wrap;
+      margin-bottom: 1rem;
+    }
+    .starter {
+      background: #e0e7ff;
+      color: #3730a3;
+      padding: 0.5rem 0.75rem;
+      border-radius: 0.5rem;
+      cursor: pointer;
+      font-size: 0.9rem;
+      transition: background 0.2s;
+    }
+    .starter:hover {
+      background: #c7d2fe;
+    }
+    textarea {
+      padding: 0.75rem;
+      width: 90%;
+      max-width: 600px;
+      height: 100px;
+      font-size: 1rem;
+      margin-bottom: 1rem;
+      border: 2px solid #cbd5e1;
+      border-radius: 0.5rem;
+      resize: vertical;
+    }
+    button {
+      padding: 0.75rem 1.5rem;
+      font-size: 1rem;
+      background-color: #4f46e5;
+      color: white;
+      border: none;
+      border-radius: 0.5rem;
+      cursor: pointer;
+      box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+      transition: background 0.2s, transform 0.1s;
+    }
+    button:disabled {
+      background-color: #a5b4fc;
+      cursor: not-allowed;
+    }
+    button:hover:not(:disabled) {
+      background-color: #4338ca;
+      transform: translateY(-1px);
+    }
+    #result {
+      margin-top: 1rem;
+      width: 90%;
+      max-width: 600px;
+      font-size: 1rem;
+      color: #334155;
+      white-space: pre-wrap;
+      word-wrap: break-word;
+      min-height: 2rem;
+      background: #fff;
+      padding: 1rem;
+      border-radius: 0.5rem;
+      border: 1px solid #e2e8f0;
+      box-shadow: inset 0 1px 3px rgba(0,0,0,0.05);
+    }
+    .loader {
+      display: inline-block;
+      width: 1rem;
+      height: 1rem;
+      border: 2px solid #4f46e5;
+      border-top-color: transparent;
+      border-radius: 50%;
+      animation: spin 1s linear infinite;
+      margin-left: 0.5rem;
+      vertical-align: middle;
+    }
+    @keyframes spin {
+      to { transform: rotate(360deg); }
+    }
+  </style>
+</head>
+<body>
+  <a href="Index.html"><Button>Home</Button></a>
+  <h1>GenZ AI Translator</h1>
+  <div class="starter-list">
+    <div class="starter" data-text="Hey fam,">Hey fam,</div>
+    <div class="starter" data-text="Real talk: ">Real talk:</div>
+    <div class="starter" data-text="So check it: ">So check it:</div>
+    <div class="starter" data-text="FYI: ">FYI:</div>
+    <div class="starter" data-text="Quick tea: ">Quick tea:</div>
+  </div>
+  <textarea id="inputPhrase" placeholder="Type any text to translate..."></textarea>
+  <button id="translateBtn">Translate</button>
+  <div id="result"></div>
+
+  <script>
+    const genZDictionary = {
+    // Gen Z dictionary (350 entries truncated for brevity
+  "hello": "yo",
+  "how are you": "wyd",
+  "i am fine": "vibin",
+  "good job": "slay",
+  "cool": "lit",
+  "that is good": "that slaps",
+  "you are lying": "cap",
+  "i agree": "real",
+  "are you serious": "deadass",
+  "amazing": "goated",
+  "leave me alone": "ghost me",
+  "i am sad": "in my feels",
+  "that is funny": "i'm dead",
+  "no way": "sheesh",
+  "be quiet": "say less",
+  "i am shocked": "shook",
+  "i love it": "ate that",
+  "bye": "peace out",
+  "that is true": "no cap",
+  "stop": "bruh chill",
+  "i like it": "it's giving",
+  "i'm happy": "big vibes",
+  "that is boring": "mid",
+  "you look good": "snatched",
+  "what is going on": "vibe check",
+  "disappeared": "ghosted",
+  "fashionable": "drip",
+  "i'm tired": "zonked",
+  "congratulations": "W",
+  "that was bad": "L",
+  "delicious": "bussin",
+  "show off": "flex",
+  "crazy": "wildin'",
+  "i’m confused": "what is this behavior",
+  "don't care": "IDRC",
+  "you did great": "you ate",
+  "i'm laughing": "screaming",
+  "weird": "sus",
+  "unbelievable": "bombastic",
+  "disgusting": "ick",
+  "fighting": "throwing hands",
+  "just kidding": "jk lol",
+  "yes": "facts",
+  "no": "nah fam",
+  "jealous": "pressed",
+  "upset": "salty",
+  "strong": "built different",
+  "favorite": "main character",
+  "let's go": "full send",
+  "come on": "catch these hands",
+  "take a break": "touch grass",
+  "look at this": "caught in 4k",
+  "i don’t understand": "i'm lost",
+  "i’m not sure": "lowkey",
+  "obviously": "highkey",
+  "you are right": "real talk",
+  "get serious": "be fr",
+  "i don’t care": "zero f's",
+  "it’s okay": "chill",
+  "i'm angry": "i’m heated",
+  "i feel you": "same",
+  "that is awesome": "fire",
+  "you are smart": "big brain",
+  "super hot": "zaddy",
+  "let’s party": "it’s a vibe",
+  "i'm nervous": "not me",
+  "you’re cool": "real one",
+  "we’re done": "cancelled",
+  "watch out": "red flag",
+  "great music": "bop",
+  "excited": "hyped",
+  "i’m sorry": "my bad",
+  "i’m done": "i can’t even",
+  "totally": "fr fr",
+  "leave": "bounce",
+  "don’t talk to me": "mute him",
+  "i like that": "that’s valid",
+  "do it": "pop off",
+  "show me": "drop the receipts",
+  "not interested": "hard pass",
+  "definitely": "say less",
+  "wait a second": "hold up",
+  "laughing a lot": "weak af",
+  "we are close": "besties",
+  "it's real": "no printer",
+  "it's fake": "sus af",
+  "you’re brave": "king behavior",
+  "so pretty": "aesthetic queen",
+  "over the top": "extra",
+  "very tired": "brainrot",
+  "you did well": "big slay",
+  "can’t handle it": "over it",
+  "i’m serious": "deadass fr",
+  "just do it": "full send",
+  "stop lying": "cap detected",
+  "you’re funny": "goofy ahh",
+  "i’m disappointed": "big yikes",
+  "sad but true": "feels bad",
+  "keep going": "never been done before",
+  "don’t be silly": "delulu much",
+  "act normal": "unclench",
+  "try again": "run it back",
+  "be honest": "tbh",
+  "i’m thinking": "3am thoughts",
+  "sleepy": "sleepy tok",
+  "wait what": "shooketh",
+  "it's nice": "clean aesthetic",
+  "do you get it": "iykyk",
+  "i’ll try": "soft launch",
+  "he’s amazing": "he's him",
+  "she’s amazing": "she’s her",
+  "i don’t know": "idk man",
+  "stop talking": "bruh stahp",
+  "i believe you": "ong",
+  "very good": "slaps hard",
+  "not that good": "eh, mid",
+  "so relatable": "whole mood",
+  "not funny": "cringe af",
+  "i’m tired of this": "i’m weakkk",
+  "see you later": "bye bestie",
+  "what are you doing": "wyd rn",
+  "i miss you": "IMY",
+  "be careful": "watch ur back",
+  "tell me": "spill the tea",
+  "shocking": "caught off guard",
+  "he’s annoying": "walking red flag",
+  "you’re lying": "that's cap",
+  "proof": "drop the receipts",
+  "i agree completely": "real af",
+  "bad decision": "L move",
+  "funny person": "memer",
+  "it's lame": "not it",
+  "i love this": "core memory",
+  "why though": "big why",
+  "can you believe": "deadass tho",
+  "i’m emotional": "in my bag",
+  "you win": "W friend",
+  "you lost": "L + ratio",
+  "confusing": "vibe shift",
+  "very close": "4L",
+  "i’m out": "peace",
+  "be nice": "green flag energy",
+  "pretty good": "not bad ngl",
+  "fun times": "vibe era",
+  "strange": "sussy",
+  "ignore it": "scroll on",
+  "stop overthinking": "chill fr",
+  "good looking": "snack",
+  "i can’t believe it": "bruh moment",
+  "it’s real": "legit",
+  "be confident": "main chara energy",
+  "start again": "reboot",
+  "that’s enough": "done for",
+  "show up": "hard launch",
+  "fake friend": "flop bestie",
+  "no energy": "dry af",
+  "you’re perfect": "it girl",
+  "he’s not worth it": "no riz",
+  "so cute": "giggly",
+  "really strong": "shredded",
+  "super stylish": "drip overload",
+  "i need space": "ghost mode",
+  "embarrassing": "cringe core",
+  "in real life": "irl",
+  "true love": "OTP",
+  "trust me": "on god",
+  "you win": "you ate and left no crumbs",
+  "i’m bored": "dry texting",
+  "too much info": "TMI",
+  "taking a break": "soft log",
+  "flexible": "built diff",
+  "overthinking": "head empty",
+  "random thought": "shower thought",
+  "wants attention": "thirsty",
+  "acting weird": "off vibe",
+  "not listening": "tuned out",
+  "need help": "send help",
+  "that was weird": "bombastic side eye",
+  "too much": "doing the most",
+  "i’m done": "log off",
+  "be real": "no filters",
+  "i’m trying": "lowkey grinding",
+  "not good": "down bad",
+  "just thinking": "brain afk",
+  "cool idea": "valid thought",
+  "favorite song": "daily bop",
+  "funny situation": "goofy moment",
+  "very cringe": "painful to watch",
+  "you are awesome": "you're that girl",
+  "calm down": "take a chill pill",
+  "leave me alone": "don't talk to me right now",
+  "silly": "a whole clown",
+  "crazy": "wildin'",
+  "good morning": "mornin' fam",
+  "good night": "sleep tight",
+  "how are you": "what’s the vibe?",
+  "I am stressed": "I’m losing it",
+  "thank you": "thanks fam",
+  "you’re welcome": "no prob",
+  "what are you doing": "what’s good?",
+  "help me": "send help",
+  "I don't know": "idk man",
+  "so cool": "that’s fire",
+  "I am busy": "I’m swamped",
+  "you got this": "you’re gonna crush it",
+  "no worries": "it’s all good",
+  "calm down": "chill fam",
+  "stop talking": "shut it",
+  "let’s go": "bet",
+  "I am confused": "I’m lost",
+  "I don’t understand": "this makes no sense",
+  "no way": "no cap",
+  "okay": "bet",
+  "I think so": "maybe, idk",
+  "I am not sure": "lowkey unsure",
+  "you are annoying": "you’re a pain",
+  "I like it": "this hits",
+  "this is fun": "this slaps",
+  "what's up": "what's tea?",
+  "I need help": "SOS",
+  "take care": "be safe",
+  "I’m tired": "I’m drained",
+  "I don’t care": "zero f's given",
+  "so good": "this is bussin",
+  "it’s fine": "it's cool",
+  "leave me alone": "leave me be",
+  "are you kidding me": "deadass?",
+  "I feel good": "I'm vibing",
+  "this is crazy": "this is mad",
+  "I’m in trouble": "I'm in deep",
+  "that's awesome": "that’s lit",
+  "it's all good": "it's chill",
+  "I agree": "facts",
+  "I disagree": "nah",
+  "you’re the best": "you're top tier",
+  "you’re right": "real talk",
+  "good idea": "solid move",
+  "you’re cool": "you’re a vibe",
+  "good luck": "good vibes",
+  "you look great": "you’re fire",
+  "I’m not okay": "I'm not good fam",
+  "I’m so happy": "I’m living my best life",
+  "I’m so proud": "big W energy",
+  "thanks for this": "appreciate that",
+  "I can't believe it": "can't wrap my head around it",
+  "I need a break": "I'm gonna take five",
+  "how are you feeling": "what’s your vibe?",
+  "that’s funny": "I’m weak",
+  "really?": "fr?",
+  "so pretty": "you're giving queen",
+  "it’s beautiful": "that's aesthetic",
+  "look at that": "peep this",
+  "good vibes": "good energy",
+  "I’m done": "I’m out",
+  "I’m bored": "I’m just scrolling",
+  "I feel like": "I'm kinda feeling like",
+  "I can’t wait": "I’m so hyped",
+  "this is perfect": "this is everything",
+  "I'm sorry": "my bad",
+  "no worries": "it's nothing",
+  "I miss you": "IMY",
+  "I don't know what to do": "I'm stuck",
+  "this is boring": "this is mid",
+  "too much": "doing the most",
+  "so amazing": "this is fire",
+  "this is scary": "this is spooky",
+  "I don't get it": "I’m not with it",
+  "I’m confused": "I don't get what's going on",
+  "you made my day": "you just lit up my vibe",
+  "I’m shocked": "I’m shook",
+  "I didn’t expect that": "this caught me off guard",
+  "you’re crazy": "you wildin'",
+  "I don’t care": "I'm indifferent",
+  "don't worry": "it's chill",
+  "let's chill": "let’s kick it",
+  "that’s cool": "that’s dope",
+  "you’re funny": "you’re a clown",
+  "we should go": "let's dip",
+  "I can’t stop": "I’m hooked",
+  "you’re awesome": "you’re a legend",
+  "I’m so proud": "big W energy",
+  "you’re right": "no cap",
+  "I feel great": "I'm on top of the world",
+  "you nailed it": "you killed it",
+  "this is great": "this is gas",
+  "what’s going on": "what’s the move?",
+  "I love this": "this is my jam",
+  "what happened": "what went down?",
+  "where’s the party": "where’s the turn up?",
+  "let’s go out": "let’s vibe out",
+  "what’s the plan": "what’s the play?",
+  "this is funny": "I can’t",
+  "don't be mad": "chill out",
+  "you did great": "you ate",
+  "this is scary": "that's wild",
+  "no problem": "it’s all good",
+  "that’s crazy": "that’s insane",
+  "how's it going": "how you livin'?",
+  "I’m so excited": "I'm hyped",
+  "I love you": "you're my ride or die",
+  "I'm excited": "I'm lit for this",
+  "you're so sweet": "you’re a real one",
+  "let's go": "full send",
+  "you’re a queen": "you’re a boss",
+  "you’re a legend": "you’re a goat",
+  "I don’t want to": "I’m good",
+  "I’m scared": "this is giving me anxiety",
+  "you’re amazing": "you’re goated",
+  "let's hang out": "let's link up",
+  "I’m out": "I'm bouncing",
+  "don't leave me": "stay wit me",
+  "I don't like it": "I'm not vibing",
+  "I can’t believe it": "that’s a bruh moment",
+  "I’m just kidding": "I’m trolling",
+  "you got this": "you got it fam",
+  "this is sick": "this is fire",
+  "I’m coming": "on my way",
+  "you're amazing": "you're a legend",
+  "this is awesome": "this is lit",
+  "you did awesome": "you killed it",
+  "this is everything": "this is so valid",
+  "stop": "hold up",
+  "take a seat": "have a seat",
+  "this is fire": "this is straight gas",
+  "I’m happy": "big vibes",
+  "you're the best": "you’re top tier",
+  "take it easy": "chill out",
+  "are you serious": "deadass?",
+  "I don't like that": "not my vibe",
+  "I don't care": "IDGAF",
+  "i like girls": "i like the huzz",
+};
+    const emojiMap = { ":smile:": "😄", ":heart:": "❤️" };
+
+    function escapeRegExp(str) {
+      return str.replace(/[.*+?^${}()|[\\]\\]/g, '\\$&');
+    }
+    function translateText(text) {
+      let result = text;
+      Object.keys(genZDictionary)
+        .sort((a, b) => b.length - a.length)
+        .forEach(key => {
+          const regex = new RegExp('\\b' + escapeRegExp(key) + '\\b', 'gi');
+          result = result.replace(regex, match => {
+            const rep = genZDictionary[key];
+            return match[0] === match[0].toUpperCase()
+              ? rep.charAt(0).toUpperCase() + rep.slice(1)
+              : rep;
+          });
+        });
+      Object.keys(emojiMap).forEach(code => {
+        result = result.replace(new RegExp(escapeRegExp(code), 'g'), emojiMap[code]);
+      });
+      return result;
+    }
+
+    const input = document.getElementById('inputPhrase');
+    const button = document.getElementById('translateBtn');
+    const resultDiv = document.getElementById('result');
+
+    // Sentence starter click
+    document.querySelectorAll('.starter').forEach(el => {
+      el.addEventListener('click', () => {
+        input.value = el.getAttribute('data-text');
+        input.focus();
+      });
+    });
+
+    // Fake thinking
+    function showThinking(callback) {
+      resultDiv.innerHTML = 'GenZ AI is thinking<span class="loader"></span>';
+      button.disabled = true;
+      setTimeout(() => {
+        callback();
+        button.disabled = false;
+      }, 5000);
+    }
+
+    button.addEventListener('click', () => {
+      const text = input.value.trim();
+      if (!text) return;
+      showThinking(() => {
+        resultDiv.textContent = translateText(text);
+      });
+    });
+
+    input.addEventListener('keydown', e => {
+      if (e.key === 'Enter' && !e.shiftKey) {
+        e.preventDefault();
+        button.click();
+      }
+    });
+  </script>
+</body>
+</html>

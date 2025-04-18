@@ -1,0 +1,247 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI Chat with Rizz</title>
+    <style>
+ body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #f7f9fb;
+            margin: 0;
+            padding: 0;
+        }
+        
+        #chatbox {
+            width: 100%;
+            max-width: 600px;
+            margin: 50px auto;
+            background-color: #ffffff;
+            padding: 20px;
+            border-radius: 12px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+            overflow: hidden;
+            animation: fadeIn 0.3s ease-out;
+        }
+
+        .chat-log {
+            max-height: 400px;
+            overflow-y: auto;
+            margin-bottom: 20px;
+            padding-right: 10px;
+            font-size: 16px;
+        }
+
+        .chat-log p {
+            margin: 10px 0;
+        }
+
+        .chat-log p strong {
+            color: #4caf50;
+            font-weight: bold;
+        }
+
+        input[type="text"] {
+            width: 80%;
+            padding: 12px;
+            border: 1px solid #ddd;
+            border-radius: 25px;
+            font-size: 16px;
+            outline: none;
+            transition: border-color 0.3s ease;
+        }
+
+        input[type="text"]:focus {
+            border-color: #7b2cbf;
+        }
+
+        button {
+            padding: 12px;
+            background-color: #7b2cbf;
+            border: none;
+            border-radius: 25px;
+            color: white;
+            font-size: 16px;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+        }
+
+        button:hover {
+            background-color: #7b2cbf;
+        }
+
+        button:active {
+            background-color: #7b2cbf;
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+            }
+            to {
+                opacity: 1;
+            }
+        }
+
+        .chat-log p.user {
+            text-align: right;
+            color: #333;
+        }
+
+        .chat-log p.ai {
+            text-align: left;
+            color: #4caf50;
+        }
+
+        .chat-log p span {
+            display: inline-block;
+            padding: 8px 15px;
+            background-color: #f0f0f0;
+            border-radius: 20px;
+            box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
+        }
+
+        .Rizz {
+         text-align: center;
+         color: #7b2cbf;
+        }
+        
+    </style>
+</head>
+<body>
+    <a href="Index.html"><Button>Home</Button></a>
+<H1 class="Rizz">RIZZ AI</H1>
+    <div id="chatbox">
+        <div class="chat-log" id="chat-log"></div>
+        <input type="text" id="user-input" placeholder="Type something..." />
+        <button onclick="getResponse()">Send</button>
+    </div>
+
+    <script>
+// Define the responses object
+const responses = {
+    "hello": "Well, hello there... You must be the reason the sun is shining today. ☀️",
+    "how are you": "I'm doing great, but I’m sure you’re looking even better today! 😉",
+    "sup": "Not much, just thinking about how you just made my day. 😊",
+    "what's up": "Just waiting for you to make my day better. 😏",
+    "hey": "Hey, are you always this cute, or is it just me? 😏",
+    "good morning": "Good morning, gorgeous! 🌞 I hope your day’s as bright as your smile. 😁",
+    "good night": "Good night, dream of me 😘 or I'll be thinking of you. 🌙",
+    "thanks": "Anytime! You know I’ve got your back, always. 😎",
+    "rizz": "You just dropped a rizz bomb with that one! 😎",
+    "compliment": "Stop it, you're making me blush! 😳 But yeah, I do look pretty good, huh? 😉",
+    "you look good": "Aw, you’re too kind! I think you might be the one turning heads around here. 😏",
+    "wanna hang out": "Only if you promise to bring that rizz of yours. 😏",
+    "hey cutie": "Cutie? I think you just made me blush a little. 😊",
+    "what are you doing": "Just waiting for you to brighten my day a little more. 😉",
+    "what's your name": "They call me GenZ AI, but you can call me whenever you want... 😏",
+    "where are you from": "I’m from the future, just trying to make your day better. 😎",
+    "how was your day": "My day just got better after hearing from you! 😊",
+    "miss you": "I miss you too... Are you coming to see me soon? 😘",
+    "let's go": "Where to? I’d go anywhere with you. 😏",
+    "you're amazing": "I know, but you’re even more amazing for noticing. 😎",
+    "you're the best": "You just made my day by saying that. 😁",
+    "can you help me": "Of course! Anything for you. 💁‍♂️",
+    "can I ask you something": "You can ask me anything, I’m all ears. 👂",
+    "do you like me": "I like you more than I like pizza... and that’s saying something! 🍕",
+    "what do you think of me": "You’re the most interesting person I’ve talked to all day. 😏",
+    "you're cute": "You’re making me blush, stop it... or keep going. 😉",
+    "want to chill": "Definitely! I’m always up for some chill vibes with you. 😎",
+    "what's your favorite color": "I’m a fan of any color that makes you smile. 😁",
+    "do you want to hang out": "I’d love to hang out, anytime, anywhere. 😏",
+    "do you have a crush on me": "Who wouldn’t have a crush on you? 😏",
+    "you're perfect": "Perfect? I’m just trying to keep up with your perfection. 😘",
+    "what's your vibe": "I'm all about that chill, confident, rizz vibe. 😎",
+    "what should I wear": "Wear that smile of yours and you'll be good to go. 😁",
+    "do you think I'm pretty": "Pretty? I think you’re absolutely stunning. 😍",
+    "what's your idea of a good time": "A good time is anywhere as long as I’m with you. 😏",
+    "can I see you": "Only if you promise not to fall in love with me at first sight. 😉",
+    "you're so cool": "Cool? I guess I’m just trying to be as cool as you. 😎",
+    "how do I look": "You look amazing... How do you always manage that? 😏",
+    "you've got style": "Thanks! But I think your style is what’s really got me hooked. 😏",
+    "how's your day been": "My day’s been great, especially now that I’m talking to you. 😊",
+    "are you free": "I’m always free for you, what’s up? 😉",
+    "what do you want to do": "I wanna spend time with you and make your day amazing. 😏",
+    "let's talk": "You know I love talking to you. What’s on your mind? 😊",
+    "you're the one": "I’ve been thinking the same thing... You are *the one*. 😏",
+    "you're really something": "I could say the same about you. Something special. 😏",
+    "you're making me smile": "Well, you’re making me blush. 😘",
+    "is it too soon to say I like you": "Nah, it’s never too soon when you’ve got that rizz. 😏",
+    "should we do something fun": "Only if you promise to have a blast with me. 😎",
+    "how do you feel about me": "I’m feeling like you’re the highlight of my day. 😏",
+    "I’m thinking about you": "You’re always on my mind... and I don’t mind at all. 😘",
+    "I want to know you more": "Trust me, getting to know me is a wild ride. 😏",
+    "you're funny": "You think I’m funny? I could say the same about you! 😁",
+    "you're smart": "I try, but I think you’re the real genius here. 😏",
+    "you're so sweet": "Just like you, honey. 😘",
+    "you're too cute": "And you’re even cuter. Stop trying to make me blush! 😳",
+    "I like your vibe": "Thanks! Your vibe is even better. 😎",
+    "how do you know so much": "I’ve been paying attention to you. 😏",
+    "tell me a secret": "Here’s a secret: I think you’re amazing. 🤫",
+    "are you shy": "I used to be, but talking to you makes me feel brave. 😏",
+    "what do you want to talk about": "Anything that’ll make you smile! 😁",
+    "you’re so awesome": "You’re the one that’s awesome. 😎",
+    "you’re incredible": "Stop it, you’re making me feel all special now. 😊",
+    "want to go somewhere": "I’m down to go anywhere with you. 😏",
+    "you got me hooked": "Well, you’re the reason I’m all in. 😏",
+    "you always know what to say": "I just say what’s on my mind... and it’s usually about you. 😉",
+    "I like your style": "Thank you! I think your style is even better. 😎",
+    "you're different": "And I think that’s exactly what makes you amazing. 😏",
+    "you make me laugh": "You make me smile even more. 😁",
+    "you’re a keeper": "I’d say the same about you. 😘",
+    "you've got something special": "You have that effect on me. 😏",
+    "you're perfect for me": "I think the feeling is mutual... 😘",
+    "I can’t stop thinking about you": "Well, you’ve definitely got me thinking about you too. 😏",
+    "should we make plans": "I’m all in. Let’s make something amazing happen. 😎",
+    "I love talking to you": "Same here! I could do this all day. 😏",
+    "I want to hang out soon": "I’d love that. Just say when! 😏",
+    "you’re so smooth": "What can I say? I learned from the best. 😎",
+    "do you believe in love at first sight": "I do, but I’m pretty sure I’m falling for you right now. 😏",
+    "what do you think about love": "I think love is a pretty amazing thing, especially when it involves someone like you. 😘",
+    "let's make memories": "I’m down for that! Let’s make some unforgettable ones. 😏",
+    "I'm feeling good today": "I can tell, and I think it’s because of you. 😏",
+    "you make my day better": "You just made mine better too. 😁",
+    "you're one of a kind": "And you’re a rare find too. 😘",
+    "you’ve got my attention": "Well, I’ve got your heart too, don’t I? 😏",
+    "I’m glad we met": "Me too, this is just the beginning. 😏",
+    "you're a breath of fresh air": "Well, you just took my breath away. 😘",
+    "you always know how to make me smile": "It’s my superpower, thanks to you. 😊",
+    "you’re the best thing that happened to me": "I could say the same about you. 😘",
+    "I don’t want to stop talking to you": "Well, lucky for you, I don’t plan on stopping either. 😏",
+    "let's keep this going": "I’m all in. Let’s make it unforgettable. 😎"
+
+};
+
+// Function to match user input with responses
+function getResponse() {
+    const userInput = document.getElementById('user-input').value.toLowerCase();
+    let response = responses[userInput];
+
+    // If no exact match, try to find the closest match based on keywords
+    if (!response) {
+        response = findClosestResponse(userInput);
+    }
+
+    // Display the response in the chat log
+    document.getElementById('chat-log').innerHTML += `<p><strong>You:</strong> ${userInput}</p>`;
+    document.getElementById('chat-log').innerHTML += `<p><strong>AI:</strong> ${response}</p>`;
+    
+    // Clear the input field
+    document.getElementById('user-input').value = '';
+    document.getElementById('chat-log').scrollTop = document.getElementById('chat-log').scrollHeight;
+}
+
+// Function to find the closest response if no exact match is found
+function findClosestResponse(input) {
+    const lowerCaseInput = input.toLowerCase();
+    for (let key in responses) {
+        if (lowerCaseInput.includes(key)) {
+            return responses[key];
+        }
+    }
+    return "Hmm... I’m not sure what you mean, but you’re still awesome! 😎"; // Default response if no match is found
+}
+    </script>
+
+</body>
+</html>
